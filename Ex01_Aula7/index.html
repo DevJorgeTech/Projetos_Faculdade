@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de tabela</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <input type="text" id="entrada"> <button type="button" id="gerar_tabela">Iniciar criação</button>
+
+    <table id="tabela">
+        <tr>
+            <td>Milisegundo</td>
+            <td>Valor aleátorio</td>
+        </tr>
+    </table>
+
+    <script>
+        const gerar_tabela = document.getElementById("gerar_tabela")
+
+        
+
+        gerar_tabela.addEventListener("click", function () {
+            const entrada = document.getElementById("entrada");
+            const tabela = document.getElementById("tabela");
+
+            for (let i = 1; i <= parseInt(entrada.value); i++) { // gera a tabela conforme o valor do input entrada
+                let num = Math.random().toPrecision(5); // todos os valores são gerados novamente cada vez que o loop for acionado
+                let datatime = new Date();
+                let milisec = datatime.getMilliseconds();
+                tabela.innerHTML += "<tr><td>" + milisec + "</td><td>" + num + "</td></tr>"; // imprime dentro da tabela os valores sempre atualizados
+            }
+        })
+    </script>
+</body>
+
+</html>
