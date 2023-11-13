@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>While</title>
+    <style>
+        #saida{
+            padding: 15px;
+            margin-top: 10px;
+            width: 50%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Fatorial de um número</h1> <br>
+    <label for="">Informe um número</label> <input type="text" id="entrada"> <br>
+    <button type="button" id="confirmar">Gerar</button>
+
+    <div id="saida"></div>
+
+    <script>
+        const confirmar = document.getElementById("confirmar")
+        
+       confirmar.addEventListener("click", function fatorial(){
+            const valorEntrada = document.getElementById("entrada").value
+            const saida = document.getElementById("saida")
+            let cont = 0
+            let valorFinal = valorEntrada
+            var valorFatorial = [] 
+
+            while(cont < valorEntrada){
+                if(valorEntrada - cont != 1){
+                    saida.innerHTML += valorEntrada - cont + " X "
+                    valorFatorial.push(valorEntrada - cont)
+                } else {
+                    for(i = 1; i < valorFatorial.length; i++){
+                        valorFinal *= valorFatorial[i] 
+                    }
+                    saida.innerHTML += valorEntrada - cont + " = " + valorFinal
+                }
+                cont++  
+            }
+        })
+       
+    </script>
+</body>
+</html>
