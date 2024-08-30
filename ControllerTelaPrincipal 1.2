@@ -1,0 +1,125 @@
+package Control;
+
+import java.util.List;
+
+import Model.DaoFilme;
+import Model.Filme;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
+public class ControllerTelaPrincipal {
+
+	DaoFilme<Filme> daoFilme = new DaoFilme<>(Filme.class);
+
+	@FXML
+	private VBox regiaoCentral;
+	@FXML
+	private Button filmesCartaz;
+
+	@FXML
+	private void mostrarFilmesCartaz() {
+
+	    List<Filme> filme = daoFilme.obterTodos();
+
+	    regiaoCentral.getChildren().clear();
+
+	    VBox VboxFilmesCartaz = new VBox();
+	    VboxFilmesCartaz.getStyleClass().add("VboxFilmesCartaz");
+
+	    HBox HBoxTituloConteiner = new HBox();
+	    HBoxTituloConteiner.getStyleClass().add("HBoxTituloConteiner");
+
+	    Label HBoxTituloLabel = new Label("Filmes em Cartaz");
+	    HBoxTituloLabel.getStyleClass().add("HBoxTituloLabel");
+	    
+	    HBoxTituloConteiner.getChildren().add(HBoxTituloLabel);
+
+	    VBox VboxFilmes = new VBox(); 
+	    VboxFilmes.getStyleClass().add("VboxFilmes");
+
+	    for (Filme filme2 : filme) {
+
+	        HBox HboxChild = new HBox();
+	        HboxChild.getStyleClass().add("HboxChild");
+
+	        HBox HboxLabel = new HBox();
+	        HboxLabel.getStyleClass().add("HboxLabel");
+
+	        Label labelFilme = new Label(filme2.getNome());
+	        labelFilme.getStyleClass().add("labelFilme");
+	        HboxLabel.getChildren().add(labelFilme);
+
+	        HBox HboxButtons = new HBox();
+	        HboxButtons.getStyleClass().add("HboxButtons");
+
+	        Button buttonUpdate = new Button("Editar");
+	        buttonUpdate.setOnAction(e -> editar());
+	        Button buttonDelete = new Button("Remover");
+	        HboxButtons.getChildren().addAll(buttonUpdate, buttonDelete);
+
+	        if (filme.size() > 10) {
+	            HboxLabel.setStyle("-fx-pref-width: 580px;");
+	            labelFilme.setStyle("-fx-pref-width: 580px;");
+	            HboxButtons.setStyle("-fx-spacing: 15px;");
+	        }
+
+	        HboxChild.getChildren().addAll(HboxLabel, HboxButtons);
+	        VboxFilmes.getChildren().add(HboxChild); // Adiciona HboxChild ao VboxFilmes
+	    }
+
+	    if (filme.size() > 10) {
+	        ScrollPane scrollPane = new ScrollPane(VboxFilmes);
+	        scrollPane.setFitToWidth(true); // Ajusta a largura do ScrollPane
+	        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+	        VboxFilmesCartaz.getChildren().addAll(HBoxTituloConteiner, scrollPane); // Adiciona o ScrollPane ao VBox principal
+	    } else {
+	        VboxFilmesCartaz.getChildren().addAll(HBoxTituloConteiner, VboxFilmes); // Adiciona os filmes diretamente
+	    }
+
+	    regiaoCentral.getChildren().add(VboxFilmesCartaz); // Adiciona VboxFilmesCartaz a regiaoCentral
+	}
+	
+	private void editar(){
+		
+		System.out.println("Caiu aqui");
+		
+		VBox vboxEditarFather = new VBox();
+		vboxEditarFather.getStyleClass().add("vboxEditarFather");
+		
+		HBox forms1 = new HBox();
+		Label nome_filme = new Label("Nome do filme: ");
+		TextField inputNomeFilme = new TextField();		
+		forms1.getChildren().addAll(nome_filme,inputNomeFilme);
+		
+		HBox forms2 = new HBox();
+		Label sinopse = new Label("Sinopse: ");
+		TextField inputSinopse = new TextField();		
+		forms2.getChildren().addAll(sinopse,inputSinopse);
+
+		
+		HBox forms3 = new HBox();
+		Label classificacao = new Label("Classificacao: ");
+		TextField inputClassificacao = new TextField();		
+		forms3.getChildren().addAll(classificacao,inputClassificacao);
+
+		HBox forms4 = new HBox();
+		Label genero = new Label("Gênero ");
+		TextField inputGenero = new TextField();	
+		forms4.getChildren().addAll(genero,inputGenero);
+
+		
+		vboxEditarFather.getChildren().addAll(forms1,forms2,forms3,forms4);
+
+		VBox accessedHBox = (VBox) regiaoCentral.getChildren().get(0);
+		accessedHBox.getChildren().add(vboxEditarFather);
+		
+		accessedHBox.toBack();
+		vboxEditarFather.toFront();
+		
+	}
+}
