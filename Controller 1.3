@@ -1,0 +1,217 @@
+package Control;
+
+import java.util.List;
+
+import Model.DaoFilme;
+import Model.Filme;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+public class ControllerTelaPrincipal {
+
+	DaoFilme<Filme> daoFilme = new DaoFilme<>(Filme.class);
+
+	@FXML
+	private VBox regiaoCentral;
+	
+	@FXML
+	private Button filmesCartaz;
+	
+	@FXML
+	private Button filmesEmBreve;
+	
+    @FXML
+	private void initialize() {
+		filmesCartaz.setOnAction(e -> {
+			mostrarFilmesCartaz(1);
+		});
+		
+		filmesEmBreve.setOnAction(e -> {
+			mostrarFilmesCartaz(0);
+		});
+	}
+	
+	
+	
+	@FXML
+	private void mostrarFilmesCartaz(int i) {
+
+		List<Filme> filmesEmCartaz;
+		
+		if (i == 1) {
+			filmesEmCartaz = daoFilme.obterTodosEmCartaz();
+		} else {
+			filmesEmCartaz = daoFilme.obterTodosEmBreve();
+		}
+
+		regiaoCentral.getChildren().clear();
+
+		VBox VboxFilmesCartaz = new VBox();
+		VboxFilmesCartaz.getStyleClass().add("VboxFilmesCartaz");
+
+		HBox HBoxTituloConteiner = new HBox();
+		HBoxTituloConteiner.getStyleClass().add("HBoxTituloConteiner");
+		HBoxTituloConteiner.setMaxHeight(100);
+
+		Label HBoxTituloLabel = new Label("Filmes em Cartaz");
+		HBoxTituloLabel.getStyleClass().add("HBoxTituloLabel");
+
+		HBoxTituloConteiner.getChildren().add(HBoxTituloLabel);
+
+		VBox VboxFilmes = new VBox();
+		VboxFilmes.getStyleClass().add("VboxFilmes");
+
+		for (Filme filme2 : filmesEmCartaz) {
+
+			HBox HboxChild = new HBox();
+			HboxChild.getStyleClass().add("HboxChild");
+
+			HBox HboxLabel = new HBox();
+			HboxLabel.getStyleClass().add("HboxLabel");
+
+			Label labelFilme = new Label(filme2.getNome());
+			labelFilme.getStyleClass().add("labelFilme");
+			HboxLabel.getChildren().add(labelFilme);
+
+			HBox HboxButtons = new HBox();
+			HboxButtons.getStyleClass().add("HboxButtons");
+
+			Button buttonUpdate = new Button("Editar");
+			buttonUpdate.setOnAction(e -> editar(filme2));
+			Button buttonDelete = new Button("Remover");
+			buttonDelete.setOnAction(e -> {
+				Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow(); // Obtém o Stage atual
+				confirmaDelete(stage, filme2);
+			});
+			HboxButtons.getChildren().addAll(buttonUpdate, buttonDelete);
+
+			if (filmesEmCartaz.size() > 10) {
+				HboxLabel.setStyle("-fx-pref-width: 580px;");
+				labelFilme.setStyle("-fx-pref-width: 580px;");
+				HboxButtons.setStyle("-fx-spacing: 15px;");
+			}
+
+			HboxChild.getChildren().addAll(HboxLabel, HboxButtons);
+			VboxFilmes.getChildren().add(HboxChild); // Adiciona HboxChild ao VboxFilmes
+		}
+
+		if (filmesEmCartaz.size() > 10) {
+			ScrollPane scrollPane = new ScrollPane(VboxFilmes);
+			scrollPane.setFitToWidth(true); // Ajusta a largura do ScrollPane
+			scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+			VboxFilmesCartaz.getChildren().addAll(HBoxTituloConteiner, scrollPane); // Adiciona o ScrollPane ao VBox
+																					// principal
+		} else {
+			VboxFilmesCartaz.getChildren().addAll(HBoxTituloConteiner, VboxFilmes); // Adiciona os filmes diretamente
+		}
+
+		regiaoCentral.getChildren().add(VboxFilmesCartaz); // Adiciona VboxFilmesCartaz a regiaoCentral
+	}
+
+	private void editar(Filme filme) {
+
+		List<Filme> filmesEmCartaz = daoFilme.obterTodosEmCartaz();
+
+		VBox accessedHBox = (VBox) regiaoCentral.getChildren().get(0);
+		accessedHBox.getChildren().clear();
+
+		VBox vboxEditarFather = new VBox();
+		vboxEditarFather.getStyleClass().add("vboxEditarFather");
+
+		accessedHBox.getChildren().add(vboxEditarFather);
+
+		HBox forms1 = new HBox();
+		Label nome_filme = new Label("Nome do filme: ");
+		TextField inputNomeFilme = new TextField(filme.getNome());
+		forms1.getChildren().addAll(nome_filme, inputNomeFilme);
+		forms1.getStyleClass().add("forms");
+		nome_filme.getStyleClass().add("LabelEditar");
+		inputNomeFilme.getStyleClass().add("inputLabel");
+
+		HBox forms2 = new HBox();
+		Label classificacao = new Label("Classificacao: "); // Classificação
+		TextField inputClassificacao = new TextField(filme.getClassificacao());
+		forms2.getChildren().addAll(classificacao, inputClassificacao);
+		forms2.getStyleClass().add("forms");
+		classificacao.getStyleClass().add("LabelEditar");
+		inputClassificacao.getStyleClass().add("inputLabel");
+
+		HBox forms3 = new HBox();
+		Label genero = new Label("Gênero ");
+		ChoiceBox<String> inputGenero = new ChoiceBox<>();
+		inputGenero.setValue(filme.getGenero());
+		inputGeneroOpcoes(inputGenero);
+		forms3.getChildren().addAll(genero, inputGenero);
+		forms3.getStyleClass().add("forms");
+		genero.getStyleClass().add("LabelEditar");
+		inputGenero.getStyleClass().add("inputLabel");
+
+		HBox forms4 = new HBox();
+		Label sinopse = new Label("Sinopse: ");
+		TextArea inputSinopse = new TextArea(filme.getSinopse()); // Add sinopse
+		forms4.getChildren().addAll(sinopse, inputSinopse);
+		forms4.getStyleClass().add("forms");
+		sinopse.getStyleClass().add("LabelEditar");
+		inputSinopse.getStyleClass().add("inputLabel");
+
+		HBox forms5 = new HBox();
+		Button salvar = new Button("Salvar");
+		salvar.setOnAction(e -> {
+			daoFilme.updateFilme(filme,inputNomeFilme.getText(),
+					inputClassificacao.getText(), 
+					inputGenero.getValue(), 
+					inputSinopse.getText());
+		});
+		Button cancelar = new Button("Cancelar");
+		cancelar.setOnAction(e -> {
+			
+		});
+		forms5.getStyleClass().add("forms");
+		forms5.getChildren().addAll(salvar, cancelar);
+		forms5.getStyleClass().add("forms5");
+
+		vboxEditarFather.getChildren().addAll(forms1, forms2, forms3, forms4, forms5);
+
+	}
+
+	public void inputGeneroOpcoes(ChoiceBox<String> ChoiceBox) {
+
+		List<String> listaGeneros = daoFilme.obterGeneros();
+		ObservableList<String> observableGeneros = FXCollections.observableArrayList(listaGeneros);
+
+		ChoiceBox.setItems(observableGeneros);
+	}
+
+	
+	private void confirmaDelete(Stage owner, Filme filme) {
+		Alert alert = new Alert(Alert.AlertType.NONE);
+		alert.initOwner(owner); // Associa o alerta à janela principal
+		alert.setTitle("Confirmar Exclusão");
+		alert.setHeaderText("Deseja realmente deletar este filme?");
+
+		ButtonType buttonYes = new ButtonType("Sim");
+		ButtonType buttonNo = new ButtonType("Não");
+
+		alert.getButtonTypes().setAll(buttonYes, buttonNo);
+
+		alert.showAndWait().ifPresent(response -> {
+			if (response == buttonYes) {
+				daoFilme.removerFilme(filme);
+			}
+		});
+
+	}
+}
